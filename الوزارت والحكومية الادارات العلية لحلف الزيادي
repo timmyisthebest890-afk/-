@@ -1,0 +1,81 @@
+<!-- Settings Container -->
+<section id="settings-panel" aria-labelledby="settings-heading">
+  <h2 id="settings-heading">App Settings</h2>
+
+  <!-- Language Selection -->
+  <div class="setting-group">
+    <label for="language-select">Select Language:</label>
+    <select id="language-select" aria-label="Change website language">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select>
+  </div>
+
+  <!-- Voiceover Text Example -->
+  <main>
+    <h1 id="welcome-text">Welcome to our website!</h1>
+    
+    <!-- An icon-only button needs an explicit aria-label for VoiceOvers -->
+    <button id="action-btn" aria-label="Play welcome audio announcement">
+      🔊 Speak
+    </button>
+  </main>
+</section>
+const translations = {
+  en: {
+    welcome: "Welcome to our website!",
+    btnLabel: "Play welcome audio announcement",
+    speakText: "Hello! Welcome to our accessible website."
+  },
+  es: {
+    welcome: "¡Bienvenido a nuestro sitio web!",
+    btnLabel: "Reproducir anuncio de audio de bienvenida",
+    speakText: "¡Hola! Bienvenido a nuestro sitio web accesible."
+  },
+  fr: {
+    welcome: "Bienvenue sur notre site web!",
+    btnLabel: "Jouer l'annonce audio de bienvenue",
+    speakText: "Bonjour! Bienvenue sur notre site web accessible."
+  }
+};
+// Track the current active language settings
+let currentLang = 'en';
+
+const langSelect = document.getElementById('language-select');
+const welcomeText = document.getElementById('welcome-text');
+const actionBtn = document.getElementById('action-btn');
+
+// Function to update the UI text based on Language Setting
+function updateLanguage(lang) {
+  currentLang = lang;
+  
+  // Update HTML language attribute so external screen readers adapt automatically
+  document.documentElement.lang = lang; 
+  
+  // Swap UI text
+  welcomeText.textContent = translations[lang].welcome;
+  
+  // Update the hidden accessibility label for VoiceOver users
+  actionBtn.setAttribute('aria-label', translations[lang].btnLabel);
+}
+
+// Function to trigger the Native Voiceover
+function triggerVoiceover() {
+  // Check if browser supports speech synthesis
+  if ('speechSynthesis' in window) {
+    const textToSpeak = translations[currentLang].speakText;
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    
+    // Match the voiceover accent to the selected setting language
+    utterance.lang = currentLang; 
+    
+    window.speechSynthesis.speak(utterance);
+  } else {
+    alert("Voiceover features are not supported on this browser version.");
+  }
+}
+
+// Event Listeners for user interaction
+langSelect.addEventListener('change', (e) => updateLanguage(e.target.value));
+actionBtn.addEventListener('click', triggerVoiceover);
